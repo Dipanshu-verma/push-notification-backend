@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
  
-// get
+ 
 app.get("/token", async(req,res)=>{
     try {
         
