@@ -1,53 +1,113 @@
+// const express = require("express");
+// const cors = require("cors");
+
+// require("dotenv").config();
+// const app = express();
+
+// app.use(express.json());
+// app.use(cors());
+
+// app.get("/token", async(req,res)=>{
+//     try {
+
+//         const tokens =  await TokenModel.find();
+//         res.status(200).json(tokens)
+//     } catch (error) {
+//         res.status(500).json({error:"Internal Server Error"})
+//     }
+// })
+
+// app.listen(8000, async () => {
+//     await MongoConnected();
+//     console.log(`Server is running at ${8000}`);
+// });
+
 const express = require("express");
+const admin = require("firebase-admin");
+const mongoose = require("mongoose");
 const cors = require("cors");
 const { MongoConnected } = require("./db/db");
-const { TokenModel } = require("./model/tokenModel");
- 
-require("dotenv").config();
-const app = express();
 
+const { TokenModel } = require("./model/tokenModel");
+// Initialize Express app
+const app = express();
 app.use(express.json());
 app.use(cors());
- 
- 
-app.get("/token", async(req,res)=>{
-    try {
-        
-        const tokens =  await TokenModel.find();
-        res.status(200).json(tokens)
-    } catch (error) {
-        res.status(500).json({error:"Internal Server Error"})
-    }
-})
+// Initialize Firebase Admin SDK
+const serviceAccount = require("./push-edbf5-firebase-adminsdk-qf8rh-7cc197265a.json");
 
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
- app.post("/token", async(req,res)=>{
+// Initialize MongoDB connection
 
-    const {token} =  req.headers;
-     
-    try {
-           
-        const exist =  await TokenModel.findOne({token});
-        if(exist){
-           return res.status(201).json({token:exist.token})
-        }
+// Endpoint to receive notification data from frontend
 
- 
-        const newToken =  new TokenModel({token})
+app.post("/token", async (req, res) => {
+  const { token } = req.headers;
 
-        await newToken.save();
-        
-        res.status(201).json(newToken)
-    } catch (error) {
-        res.status(500).json({error:"Internal Server Error"})
+  try {
+    const exist = await TokenModel.findOne({ token });
+    if (exist) {
+      return res.status(201).json({ token: exist.token });
     }
 
- })
+    const newToken = new TokenModel({ token });
 
+    await newToken.save();
 
+    res.status(201).json(newToken);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
+app.get("/tokens", async (req, res) => {
+  try {
+    const tokens = await TokenModel.find();
 
-app.listen(8000, async () => {
-    await MongoConnected();
-    console.log(`Server is running at ${8000}`);
+    res.status(200).json(tokens);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("/sendNotification", (req, res) => {
+  const { token, title, body, imageUrl } = req.body;
+  console.log(req.body);
+
+  // Construct message payload
+  const message = {
+    notification: {
+      title,
+      body,
+      image: imageUrl,
+    },
+
+    token,
+  };
+
+  // Send the message
+  admin
+    .messaging()
+    .send(message)
+    .then(() => {
+      // Save notification data to MongoDB
+      //   const notification = new Notification({ token, title, body, imageUrl });
+      //   notification.save();
+
+      res.send("Notification sent successfully");
+    })
+    .catch((error) => {
+      console.error("Error sending notification:", error);
+      res.status(500).send("Error sending notification");
+    });
+});
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, async () => {
+  await MongoConnected();
+  console.log(`Server is running on port ${PORT}`);
 });
