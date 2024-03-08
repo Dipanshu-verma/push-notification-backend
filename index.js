@@ -35,13 +35,17 @@ app.get("/tokens", async (req, res) => {
 
 app.post("/token", async (req, res) => {
   const { token } = req.headers;
+ 
 
   try {
-    const exist = await TokenModel.findOne({ token });
+    const exist = await TokenModel.findOne({token});
+   
+
     if (exist) {
       return res.status(201).json({ token: exist.token });
     }
 
+     
     const newToken = new TokenModel({ token });
 
     await newToken.save();
@@ -91,5 +95,6 @@ app.post("/sendNotification", (req, res) => {
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, async () => {
   await MongoConnected();
+  
   console.log(`Server is running on port ${PORT}`);
 });
