@@ -33,24 +33,24 @@ app.get("/tokens", async (req, res) => {
   });
 
 
-// app.post("/token", async (req, res) => {
-//   const { token } = req.headers;
+app.post("/token", async (req, res) => {
+  const { token } = req.headers;
 
-//   try {
-//     const exist = await TokenModel.findOne({ token });
-//     if (exist) {
-//       return res.status(201).json({ token: exist.token });
-//     }
+  try {
+    const exist = await TokenModel.findOne({ token });
+    if (exist) {
+      return res.status(201).json({ token: exist.token });
+    }
 
-//     const newToken = new TokenModel({ token });
+    const newToken = new TokenModel({ token });
 
-//     await newToken.save();
+    await newToken.save();
 
-//     res.status(201).json(newToken);
-//   } catch (error) {
-//     res.status(500).json({ error: "Internal Server Error" });
-//   }
-// });
+    res.status(201).json(newToken);
+  } catch (error) {
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 
 
@@ -58,7 +58,7 @@ app.get("/tokens", async (req, res) => {
 
 app.post("/sendNotification", (req, res) => {
   const { token, title, body, imageUrl } = req.body;
-  console.log(req.body);
+ 
 
   // Construct message payload
   const message = {
