@@ -57,7 +57,7 @@ app.post("/token", async (req, res) => {
 
     res.status(201).json(newToken);
   } catch (error) {
-    res.status(400).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
