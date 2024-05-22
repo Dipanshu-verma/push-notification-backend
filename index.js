@@ -28,28 +28,15 @@ app.get("/tokens", async (req, res) => {
       const tokens = await TokenModel.find();
   
       res.status(200).json(tokens);
-      const tokens = await TokenModel.find();
-  
-      res.status(200).json(tokens);
     } catch (error) {
       res.status(500).json({ error: "Internal Server Error" });
       res.status(500).json({ error: "Internal Server Error" });
     }
   });
-  });
+  
 
 
-app.post("/token", async (req, res) => {
-  const { token } = req.headers;
  
-
-  try {
-    const exist = await TokenModel.findOne({token});
-   
-
-    if (exist) {
-      return res.status(201).json({ token: exist.token });
-    }
 app.post("/token", async (req, res) => {
   const { token } = req.headers;
  
@@ -64,8 +51,7 @@ app.post("/token", async (req, res) => {
 
      
     const newToken = new TokenModel({ token });
-     
-    const newToken = new TokenModel({ token });
+   
 
     await newToken.save();
 
