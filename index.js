@@ -39,7 +39,7 @@ app.get("/tokens", async (req, res) => {
  
 app.post("/token", async (req, res) => {
   const { token } = req.headers;
- 
+ console.log(token); 
 
   try {
     const exist = await TokenModel.findOne({token});
@@ -57,7 +57,7 @@ app.post("/token", async (req, res) => {
 
     res.status(201).json(newToken);
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(400).json({ error: "Internal Server Error" });
   }
 });
 
