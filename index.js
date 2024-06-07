@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
  
-const serviceAccount = require("./push-notification-547ad-firebase-adminsdk-aw919-fcecfdbaab.json");
+const serviceAccount = require("./push-edbf5-firebase-adminsdk-qf8rh-2bb5049a9b.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
